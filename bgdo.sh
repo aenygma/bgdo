@@ -6,7 +6,7 @@
 
 EXP_TIME=10
 
-BASEDIR=~/bgdo/
+BASEDIR=~/bgdo/test/
 #TMPFILE=`mktemp -t $BASEDIR`
 MSGTMPL="Job Done."
 
