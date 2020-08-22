@@ -7,4 +7,5 @@
         tie into notification system
         or nc | notify
 
+        notify for vt/tty sessions
 
