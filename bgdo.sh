@@ -4,13 +4,14 @@
 #   BGDO: DO things in deferred way   
 #
 
+# GLOBALS
 EXP_TIME=10
-
 BASEDIR=~/bgdo/test/
 #TMPFILE=`mktemp -t $BASEDIR`
-MSGTMPL="Job Done."
+MSGTMPL="Alert:\n\n\tResults in Dir: "
 
 
+# UTILS
 rand_string() {
     # Generate random string of $1 length
 
@@ -49,37 +50,32 @@ bgdo() {
     # Do the thing
     "$@" 1>$TMPOUT 2>$TMPERR
 
-    # Notify
-    local_notify $msg $
-
+    # Note Completion
+    _alert_local "low" "$MSGTMPL : $TMPDIR"
 }
 
-local_notify() {
+_alert_local() {
+    # Wrapper for triggering machine-local alert
 
-    # local
-    local msg=$1
-    local urg=${2:-low}
+    # vars
+    if [ "$#" -lt 2 ]; then
+        echo "Usage: $0 <sev> <msg>"
+        return
+    fi 
+
+    local urg=$1
+    local msg=${@:2}
+
     notify-send         \
         --icon=gtk-info \
-        -t $EXP_TIME    \
-        -u $urg         \
-        -a "BGDO"       \
-        "$MSGTMPL $msg"
-
-   # remote
-}
-
-send_to_remote(){
-    # Called by a remote ssh, ie listener, wanting to get messages from socket
-    # Send to remote
-
-    socat UNIX-RECV:~/tmp/alert_socket -
-
+        -u $1         \
+        "BGDO"          \
+        "$msg"
 }
 
 start_listening(){
-    # Called by listener wanting to get msgs 
-    # from server $1
+    # Called by listener wanting to get msgs from server $1
+    #   called always from local to host
     #
     # ref: https://unix.stackexchange.com/questions/194224
 
@@ -91,9 +87,11 @@ start_listening(){
 
     local hostname=$1
 
-    ssh $hostname 'socat UNIX-RECV:/tmp/alert_socket -' | \
-    while read msg sev; do\
-        local_notify "$msg" "$sev";
+    # TODO: add notification user on systems
+    ssh $hostname 'while cat ~/tmp/alert_socket; do : ; done;' | \
+    while read sev msg; do\
+        echo "$sev" "$msg";
+        _alert_local "$sev" "$msg";
     done;
 
 }
