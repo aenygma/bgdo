@@ -9,7 +9,7 @@ EXP_TIME=10
 BASEDIR=~/bgdo/test/
 #TMPFILE=`mktemp -t $BASEDIR`
 MSGTMPL="Alert:\n\n\tResults in Dir: "
-
+PIPE=~/tmp/alert_socket
 
 # UTILS
 rand_string() {
@@ -52,6 +52,11 @@ bgdo() {
 
     # Note Completion
     _alert_local "low" "$MSGTMPL : $TMPDIR"
+    _alert_remote "low" "$MSGTMPL : $TMPDIR"
+}
+
+_alert_remote () {
+    echo "$@" > $PIPE
 }
 
 _alert_local() {
@@ -88,9 +93,9 @@ start_listening(){
     local hostname=$1
 
     # TODO: add notification user on systems
-    ssh $hostname 'while cat ~/tmp/alert_socket; do : ; done;' | \
+    ssh $hostname 'while cat '"$PIPE"'; do : ; done;' | \
     while read sev msg; do\
-        echo "$sev" "$msg";
+        #echo "$sev" "$msg";
         _alert_local "$sev" "$msg";
     done;
 
