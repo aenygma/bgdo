@@ -50,11 +50,11 @@ bgdo() {
     "$@" 1>$TMPOUT 2>$TMPERR
 
     # Notify
-    notify 
+    local_notify $msg $
 
 }
 
-notify() {
+local_notify() {
 
     # local
     local msg=$1
@@ -67,6 +67,35 @@ notify() {
         "$MSGTMPL $msg"
 
    # remote
+}
+
+send_to_remote(){
+    # Called by a remote ssh, ie listener, wanting to get messages from socket
+    # Send to remote
+
+    socat UNIX-RECV:~/tmp/alert_socket -
+
+}
+
+start_listening(){
+    # Called by listener wanting to get msgs 
+    # from server $1
+    #
+    # ref: https://unix.stackexchange.com/questions/194224
+
+    # check params
+    if [ "$#" -lt 2 ]; then
+        echo "Need host to send msg"
+        return
+    fi;
+
+    local hostname=$1
+
+    ssh $hostname 'socat UNIX-RECV:~/tmp/alert_socket -' | \
+    while read msg sev; do\
+        local_notify "$msg" "$sev";
+    done;
+
 }
 
 # Refs:
