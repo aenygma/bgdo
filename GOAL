@@ -1,0 +1,10 @@
+----- client -------------------------
+|                                    |
+|   * run job  - bash                |
+    * set priority level
+    * save stdout stdin to location
+    * and notify on finish
+        tie into notification system
+        or nc | notify
+
+
