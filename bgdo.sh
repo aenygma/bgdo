@@ -84,14 +84,14 @@ start_listening(){
     # ref: https://unix.stackexchange.com/questions/194224
 
     # check params
-    if [ "$#" -lt 2 ]; then
+    if [ "$#" -lt 1 ]; then
         echo "Need host to send msg"
         return
     fi;
 
     local hostname=$1
 
-    ssh $hostname 'socat UNIX-RECV:~/tmp/alert_socket -' | \
+    ssh $hostname 'socat UNIX-RECV:/tmp/alert_socket -' | \
     while read msg sev; do\
         local_notify "$msg" "$sev";
     done;
