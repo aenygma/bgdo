@@ -10,6 +10,8 @@ BASEDIR=~/bgdo/test/
 #TMPFILE=`mktemp -t $BASEDIR`
 MSGTMPL="Alert:\n\n\tResults in Dir: "
 PIPE=~/tmp/alert_socket
+NOTIFY_SEND=`command -v notify-send`
+
 
 # UTILS
 rand_string() {
@@ -71,11 +73,13 @@ _alert_local() {
     local urg=$1
     local msg=${@:2}
 
-    notify-send         \
-        --icon=gtk-info \
-        -u $1         \
-        "BGDO"          \
-        "$msg"
+    if [ $NOTIFY_SEND ]; then
+        notify-send         \
+            --icon=gtk-info \
+            -u $1         \
+            "BGDO"          \
+            "$msg"
+    fi;
 }
 
 start_listening(){
