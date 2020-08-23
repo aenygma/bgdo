@@ -10,7 +10,9 @@ BASEDIR=~/bgdo/test/
 #TMPFILE=`mktemp -t $BASEDIR`
 MSGTMPL="Alert:\n\n\tResults in Dir: "
 PIPE=~/tmp/alert_socket
-NOTIFY_SEND=`command -v notify-send`
+
+# reqs
+NOTIFY_SEND=$(command -v notify-send)
 
 
 # UTILS
@@ -41,10 +43,7 @@ bgdo() {
     #           (but prone to fail if cmd break in middle)
 
     # Create where to place results
-
-    #TMPDIR=$(rand_filename $BASEDIR)
-    TMPDIR=$(rand_filename)
-    #echo $TMPDIR
+    TMPDIR=$(rand_filename $BASEDIR)
     mkdir $TMPDIR
     TMPOUT="$TMPDIR/out"
     TMPERR="$TMPDIR/err"
@@ -73,7 +72,7 @@ _alert_local() {
     local urg=$1
     local msg=${@:2}
 
-    if [ $NOTIFY_SEND ]; then
+    if [ -x "$NOTIFY_SEND" ]; then
         notify-send         \
             --icon=gtk-info \
             -u $1         \
