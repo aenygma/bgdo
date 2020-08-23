@@ -56,6 +56,17 @@ bgdo() {
     _alert_remote "low" "$MSGTMPL : $TMPDIR"
 }
 
+rdo(){
+    # Run a command remotely
+
+    local user=
+    local host=$1
+    shift
+    ssh $1 '$@'
+
+    #ssh "$user" 
+}
+
 _alert_remote () {
     echo "$@" > $PIPE
 }
