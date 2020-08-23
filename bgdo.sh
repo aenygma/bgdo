@@ -64,6 +64,7 @@ rdo(){
     shift
     ssh $1 '$@'
 
+
     #ssh "$user" 
 }
 
